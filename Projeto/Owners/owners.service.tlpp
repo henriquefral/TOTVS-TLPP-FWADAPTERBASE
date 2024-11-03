@@ -1,0 +1,134 @@
+#INCLUDE "TLPP-CORE.TH"
+
+namespace owners
+
+/*/{Protheus.doc} OnwersService
+A classe responsável pela lógica, ele é o comunicador oficial da minha classe de dados, e ele vai retornar os dados para o controller.
+@type class
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+/*/
+Class OnwersService 
+
+Public Data j_Response as Json
+
+Public method new()    as Object
+Public method get()    as Json
+Public method post()   as Json
+Public method put()    as Json
+Public method delete() as Json
+
+EndClass
+/*/{Protheus.doc} OnwersService::new() as Object
+O método responsável por iniciar a resposta em Json.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@return variant, Self => A classe atual.
+/*/
+Method new() as Object Class OnwersService
+
+::j_Response := JsonObject():New()
+
+Return ( Self )
+/*/{Protheus.doc} OnwersService::get
+Responsável por solicitar a classe OwnersData os dados da minha entidade.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@param n_Page, numeric, A página que eu estou pegando dos registros.
+@param n_PageSize, numeric, O tamanho da página do retorno dos registros.
+@param [c_Filter], character, Filtro informado por parâmetros via query.
+@param [c_Fields], character, Os campos utilizados para a geração do Json.
+@param [c_Sort], character, A ordenação da query que será feita.
+@param [c_OwnerId], character, O id da minha entidade, caos queira pegar um único registro.
+@return json, A resposta dessa operação.
+/*/
+Method get(n_Page as Numeric, n_PageSize as Numeric, c_Filter as Character, c_Fields as Character, c_Sort as Character, c_OwnerId as Character) as Json Class OnwersService
+
+Local o_Data as Object
+
+o_Data := OwnersData():New("GET")
+
+o_Data:get(n_Page, n_PageSize, c_Filter, c_Fields, c_Sort, c_OwnerId)
+
+If ( o_Data:lOk )
+
+    ::j_Response := o_Data:gtJsonObjResponse()
+
+    If ( !Empty(c_OwnerId) .AND. Len(::j_Response["items"]) > 0 )
+        ::j_Response := ::j_Response["items"][1]
+    EndIf
+Else
+    ::j_Response := SetRestFault(o_Data:GetCode(), o_Data:GetMessage())
+EndIf
+
+Return ( ::j_Response )
+/*/{Protheus.doc} OnwersService::post(n_Operation as Numeric, j_Body as Json) as Json
+Faço a operação do post.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@return json, A resposta dessa operação.
+/*/
+Method post(n_Operation as Numeric, j_Body as Json) as Json Class OnwersService
+
+Local o_Data as Object
+
+o_Data := OwnersData():new("POST")
+
+::j_Response := o_Data:handleOwners(n_Operation, j_Body)
+
+If ( !o_Data:lOk )
+    ::j_Response := SetRestFault(o_Data:GetCode(), o_Data:GetMessage())
+EndIf
+
+Return ( ::j_Response )
+/*/{Protheus.doc} OnwersService::put(n_Operation as Numeric, j_Body as Json, c_OwnerId as Character) as Json
+Chamo a alteração efetiva e retorno a informação.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 31/01/2024
+@return json, A resposta dessa operação.
+/*/
+Method put(n_Operation as Numeric, j_Body as Json, c_OwnerId as Character) as Json Class OnwersService
+
+Local o_Data as Object
+
+o_Data := OwnersData():new("PUT")
+
+::j_Response := o_Data:handleOwners(n_Operation, j_Body, c_OwnerId)
+
+If ( !o_Data:lOk )
+    ::j_Response := SetRestFault(o_Data:GetCode(), o_Data:GetMessage())
+EndIf
+
+Return ( ::j_Response )
+/*/{Protheus.doc} OnwersService::delete(n_Operation as Numeric, c_OwnerId as Character) as Json
+Chamo a exclusão efetiva e retorno a informação.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 31/01/2024
+@return json, A resposta dessa operação.
+/*/
+Method delete(n_Operation as Numeric, c_OwnerId as Character) as Json Class OnwersService
+
+Local o_Data as Object
+
+o_Data := OwnersData():new("DELETE")
+
+::j_Response := o_Data:handleOwners(n_Operation, /*j_Body*/, c_OwnerId)
+
+If ( o_Data:lOk )
+    ::j_Response := o_Data:GetJsonObject()
+Else
+    ::j_Response := SetRestFault(o_Data:GetCode(), o_Data:GetMessage())
+EndIf
+
+Return ( ::j_Response )

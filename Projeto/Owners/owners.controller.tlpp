@@ -1,0 +1,163 @@
+#INCLUDE "TLPP-CORE.TH"
+
+namespace owners
+
+/*/{Protheus.doc} OnwersController
+Ele quem faz a orquestra das requsições. Passa os dados para o service.
+@type class
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+/*/
+Class OnwersController
+
+Data j_Response as Json
+Data o_Service  as Object
+
+Public method new() as Object
+
+@Get('/api/v2/owners')
+Public method get() as Logical
+
+@Get('/api/v2/owners/:id')
+Public method getById() as Logical
+
+@Post('/api/v2/owners')
+Public method post() as Logical
+
+@Put('/api/v2/owners/:id')
+Public method put() as Logical
+
+@Delete('/api/v2/owners/:id')
+Public method delete() as Logical
+
+EndClass
+/*/{Protheus.doc} OnwersController::new() as Object
+O inicializador da classe. Responsável por instanciar as classes necessárias.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@return variant, Self => A classe atual.
+/*/
+Method new() as Object Class OnwersController
+
+::o_Service := OnwersService():New()
+::j_Response := JsonObject():New()
+
+Return ( Self )
+/*/{Protheus.doc} OnwersController::get() as Logical
+Faço o controle do fluxo do verbo HTTP get.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+/*/
+Method get() as Logical Class OnwersController
+
+Local c_Fields   as Character
+Local c_Sort     as Character
+Local c_Filter   as Character
+Local n_Page     as Numeric
+Local n_PageSize as Numeric
+
+c_Fields   := utils.U_getQueryParam('FIELDS')
+c_Sort     := utils.U_getQueryParam('SORT')
+c_Filter   := utils.U_getQueryParam('FILTER')
+n_Page     := utils.U_getQueryParam('page')
+n_PageSize := utils.U_getQueryParam('pageSize')
+
+oRest:setKeyHeaderResponse('Content-Type','application/json; charset=utf-8')
+oRest:setResponse(::o_Service:get(Val(n_Page), Val(n_PageSize), c_Filter, c_Fields, c_Sort))
+
+Return .T.
+/*/{Protheus.doc} OnwersController::getById as Logical
+Metódo para pegar um único owner, com base no id do parâmetro.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+/*/
+Method getById as Logical Class OnwersController
+
+Local c_Id     as Character
+Local c_Fields as Character
+
+c_Fields := utils.U_getQueryParam("FIELDS")
+
+oRest:setKeyHeaderResponse('Content-Type','application/json; charset=utf-8')
+
+c_Id := oRest:getPathParamsRequest()["id"]
+
+oRest:setResponse(::o_Service:get(1/*n_Page*/, 10/*n_PageSize*/,/*[c_Filter]*/, c_Fields/*[c_Fields]*/,/*[c_Sort]*/, c_Id/*[c_OwnerId]*/))
+
+Return .T.
+/*/{Protheus.doc} OnwersController::post() as Logical
+Faço o controle da minha requisição post.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+/*/
+Method post() as Logical Class OnwersController
+
+Local c_Body as Character
+Local j_Body as Json
+
+oRest:setKeyHeaderResponse('Content-Type','application/json; charset=utf-8')
+
+c_Body := oRest:getBodyRequest()
+j_Body := JsonObject():New()
+
+If ( j_Body:FromJson(c_Body) == Nil )
+    oRest:SetResponse(::o_Service:post(3, j_Body))
+Else
+    setRestFault(400, "Json inválido")
+EndIf
+
+Return .T.
+/*/{Protheus.doc} OnwersController::put() as Logical
+Organizo a operação de alteração do meu owner.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 31/01/2024
+@return variant, return_description
+/*/
+Method put() as Logical Class OnwersController
+
+Local c_Body as Character
+Local c_Id   as Character
+Local j_Body as Json
+
+oRest:setKeyHeaderResponse('Content-Type','application/json; charset=utf-8')
+
+c_Id := oRest:getPathParamsRequest()['id']
+c_Body := oRest:getBodyRequest()
+j_Body := JsonObject():New()
+
+If ( j_Body:FromJson(c_Body) == Nil )
+    oRest:setResponse(::o_Service:put(4, j_Body, c_Id))
+Else
+    setRestFault(400, "Json inválido")
+EndIf
+
+Return .T.
+/*/{Protheus.doc} OnwersController::delete() as Logical
+Organizo a operação de exclusão do meu owner.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 31/01/2024
+/*/
+Method delete() as Logical Class OnwersController
+
+Local c_Id   as Character
+
+oRest:setKeyHeaderResponse('Content-Type','application/json; charset=utf-8')
+
+c_Id := oRest:getPathParamsRequest()['id']
+
+oRest:setResponse(::o_Service:delete(5, c_Id))
+
+Return .T.

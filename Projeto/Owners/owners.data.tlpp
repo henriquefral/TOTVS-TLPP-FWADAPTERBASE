@@ -1,0 +1,235 @@
+#INCLUDE "TLPP-CORE.TH"
+#INCLUDE "FWMVCDEF.CH"
+
+//Classe de manipulação de dados
+
+namespace owners
+
+/*/{Protheus.doc} OwnersData
+A classe responsável por manipular os dados dos meus owners.
+@type class
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+/*/
+Class OwnersData From FWAdapterBaseV2
+
+Public Data o_HashFields as Object
+
+Public method new() as Object
+Public method get()
+Public method handleOwners() as Logical
+Public method setHashFields()
+
+EndClass
+/*/{Protheus.doc} OwnersData::new(c_Verb as Character) as Object
+Crio as configurações do verbo.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@return variant, Self => A classe atual.
+/*/
+Method new(c_Verb as Character) as Object Class OwnersData
+
+//No super, eu referencio a classe pai, ou seja, a OwnersData que por sua vez, herda a FWAdapterBaseV2
+//Aqui, eu indico qual é o verbo HTTP no primeiro parâmetro e se ele lista o json no segundo parâmetro
+_Super:new(c_Verb/*cVerb*/, .T./*lList*/)
+
+Return ( Self )
+/*/{Protheus.doc} AddMapFields
+Mapeio os campos que eu irei receber na minha data.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@param o_Self, object, O objeto OwnersData.
+/*/
+Static Function AddMapFields(o_Self as Object)
+
+//Falo quais campos são mapeados nas informações da minha API
+o_Self:AddMapFields("id"   /*cFieldJson*/, "ZSB_ID"   /*cFieldQuery*/, .T./*lJsonField*/, .T./*lFixed*/, { "ZSB_ID"   , "C", TamSX3("ZSB_ID")[1]   , 0 }/*aStruct*/, /*cRenameField*/)
+o_Self:AddMapFields("name" /*cFieldJson*/, "ZSB_NAME" /*cFieldQuery*/, .T./*lJsonField*/, .F./*lFixed*/, { "ZSB_NAME" , 'C', TamSX3('ZSB_NAME')[1] , 0 }/*aStruct*/, /*cRenameField*/)
+o_Self:AddMapFields("rg"   /*cFieldJson*/, "ZSB_RG"   /*cFieldQuery*/, .T./*lJsonField*/, .F./*lFixed*/, { "ZSB_RG"   , 'C', TamSX3('ZSB_RG')[1]   , 0 }/*aStruct*/, /*cRenameField*/)
+o_Self:AddMapFields("cpf"  /*cFieldJson*/, "ZSB_CPF"  /*cFieldQuery*/, .T./*lJsonField*/, .F./*lFixed*/, { "ZSB_CPF"  , 'C', TamSX3('ZSB_CPF')[1]  , 0 }/*aStruct*/, /*cRenameField*/)
+o_Self:AddMapFields("email"/*cFieldJson*/, "ZSB_EMAIL"/*cFieldQuery*/, .T./*lJsonField*/, .F./*lFixed*/, { "ZSB_EMAIL", 'C', TamSX3('ZSB_EMAIL')[1], 0 }/*aStruct*/, /*cRenameField*/)
+o_Self:AddMapFields("tel1" /*cFieldJson*/, "ZSB_TEL1" /*cFieldQuery*/, .T./*lJsonField*/, .F./*lFixed*/, { "ZSB_TEL1" , 'C', TamSX3('ZSB_TEL1')[1] , 0 }/*aStruct*/, /*cRenameField*/)
+o_Self:AddMapFields("tel2" /*cFieldJson*/, "ZSB_TEL2" /*cFieldQuery*/, .T./*lJsonField*/, .F./*lFixed*/, { "ZSB_TEL2" , 'C', TamSX3('ZSB_TEL2')[1] , 0 }/*aStruct*/, /*cRenameField*/)
+
+Return Nil
+/*/{Protheus.doc} OwnersData::get
+Responsável por pegar os dados da minha entidade.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@param n_Page, numeric, A página que eu estou pegando dos registros.
+@param n_PageSize, numeric, O tamanho da página do retorno dos registros.
+@param [c_Filter], character, Filtro informado por parâmetros via query.
+@param [c_Fields], character, Os campos utilizados para a geração do Json.
+@param [c_Sort], character, A ordenação da query que será feita.
+@param [c_OwnerId], character, O id da minha entidade, caos queira pegar um único registro.
+/*/
+Method get(n_Page as Numeric, n_PageSize as Numeric, c_Filter as Character, c_Fields as Character, c_Sort as Character, c_OwnerId as Character) Class OwnersData
+
+Local a_Area   as Array
+Local c_Where  as Character
+Local a_Filter := {} as Array
+
+If ( Empty(c_OwnerId) )
+
+    c_Where := "ZSB_FILIAL = '"+FWxFilial("ZSB")+"' AND D_E_L_E_T_ = ''"
+Else
+    c_Where := "ZSB_FILIAL = '"+FWxFilial("ZSB")+"' AND ZSB_ID = '"+c_OwnerId+"' AND D_E_L_E_T_ = ''"
+EndIf
+
+a_Area := FWGetArea()
+
+AddMapFields(Self)
+
+If ( !Empty(c_Filter) )
+    AAdd(a_Filter, {"FILTER", c_Filter})
+    //Configuro o filtro informado via parâmetros de query.
+    ::SetUrlFilter(a_Filter)
+EndIf
+
+If ( !Empty(c_Fields) )
+    //Configuro os campos que serão utilizados para a geração do Json
+    ::SetFields(c_Fields)
+EndIf
+
+If ( !Empty(c_Sort) )
+    //A ordenação informada via QueryParam
+    ::SetOrderQuery(c_Sort)
+EndIf
+
+//Quando eu uso ::, eu estou referenciando o meu Self, a minha classe (OwnersData)
+
+//Digo qual é a página que será retornada
+::SetPage(n_Page)
+
+//Configuro o tamanho da página
+::SetPageSize(n_PageSize)
+
+//Configuro qual é a query que eu vou chamar, usando o namespace utils no fonte utils.tlpp
+::SetQuery(utils.U_getQuery("ZSB"))
+
+//Configuro a condição que eu criei na variável c_Where
+::SetWhere(c_Where)
+
+//Indico a ordenação padrão, caso não seja utilizado nenhum ::SetORderQuery()
+::SetOrder("ZSB_FILIAL, ZSB_ID")
+
+If ( ::Execute() )
+    ::FillGetResponse()
+EndIf
+
+FWRestArea(a_Area)
+ASize(a_Area, 0)
+
+Return Nil
+/*/{Protheus.doc} OwnersData::setHashFields
+Faço uma lista com o nome dos campos e o seu nome no banco de dados.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+/*/
+Method setHashFields() Class OwnersData
+
+::o_HashFields := THashMap():New()
+
+::o_HashFields:Set("id"   , "ZSB_ID")
+::o_HashFields:Set("name" , "ZSB_NAME")
+::o_HashFields:Set("rg"   , "ZSB_RG")
+::o_HashFields:Set("cpf"  , "ZSB_CPF")
+::o_HashFields:Set("email", "ZSB_EMAIL")
+::o_HashFields:Set("tel1" , "ZSB_TEL1")
+::o_HashFields:Set("tel2" , "ZSB_TEL2")
+
+Return Nil
+/*/{Protheus.doc} OwnersData::handleOwners(n_Operation as Numeric, j_Body as Json, c_OwnerId as Character) as Logical
+Faço a operação na entidade da tabela com base na operação informada.
+@type method
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@return json, A resposta do json.
+/*/
+Method handleOwners(n_Operation as Numeric, j_Body as Json, c_OwnerId as Character) as Logical Class OwnersData
+
+Local o_Model       as Object
+Local o_ModelZSB    as Object
+Local a_Data        as Array
+Local l_Ret  := .T. as Logical
+
+::setHashFields()
+
+If ( n_Operation <> 5 )
+    a_Data := utils.U_buildData(j_Body, Self)
+EndIf
+
+If ( n_Operation <> 3 )
+
+    If ( !utils.U_searchRecord(c_OwnerId, "ZSB") )
+
+        l_Ret := .F.
+        Return SetResponse(l_Ret)
+    EndIf
+EndIf
+
+o_Model    := FWLoadModel("MVCZSB02")
+o_ModelZSB := o_Model:GetModel("ZSBMASTER")
+
+utils.U_setOperationModel(o_Model, n_Operation)
+
+o_Model:Activate()
+
+If ( o_Model:IsActive() )
+    If ( o_Model:GetOperation() <> MODEL_OPERATION_DELETE )
+        l_Ret := utils.U_setValue(a_Data, o_ModelZSB, "ZSB")
+    EndIF
+Else
+    l_Ret := .F.
+EndIf
+
+If ( !l_Ret .OR. !(o_Model:VldData() .AND. o_Model:CommitData()) )
+
+    l_Ret := .F.
+    SetRestFault(400, utils.U_getError(o_Model:GetErrorMessage()))
+EndIf
+
+o_Model:DeActivate()
+
+FreeObj(o_ModelZSB)
+FreeObj(o_Model)
+
+Return SetResponse(l_Ret)
+/*/{Protheus.doc} SetResponse
+Monto a minha resposta em Json.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@param l_Ret, logical, Se a operação foi bem sucedida.
+@return json, O Json montado com os campos e seus conteúdos.
+/*/
+Static Function SetResponse(l_Ret as Logical) as Json
+
+Local j_Response as Json
+
+If ( l_Ret )
+
+    j_Response := JsonObject():New()
+
+    j_Response["id"]    := RTrim(ZSB->ZSB_ID)
+    j_Response["name"]  := FwHttpEncode(Rtrim(ZSB->ZSB_NAME))
+    j_Response["rg"]    := Rtrim(ZSB->ZSB_RG)
+    j_Response["cpf"]   := Rtrim(ZSB->ZSB_CPF)
+    j_Response["email"] := FwHttpEncode(Rtrim(ZSB->ZSB_EMAIL))
+    j_Response["tel1"]  := Rtrim(ZSB->ZSB_TEL1)
+    j_Response["tel2"]  := Rtrim(ZSB->ZSB_TEL2)
+
+EndIf
+
+Return ( j_Response )

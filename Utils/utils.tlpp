@@ -1,0 +1,176 @@
+#INCLUDE "TLPP-CORE.TH"
+#INCLUDE "FWMVCDEF.CH"
+
+namespace utils
+
+/*/{Protheus.doc} getQuery
+Monto a query com base na classe FWAdapterBaseV2.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@param c_Table, character, O alias da tabela que eu estou fazendo a query.
+@return character, c_Query => A query formatada.
+/*/
+User Function getQuery(c_Table as Character) as Character
+
+Local c_Query As Character
+
+c_Query := "SELECT #QueryFields# FROM " + RetSqlName(c_Table) + "  " + c_Table +" (NOLOCK) "
+c_Query += "WHERE #QueryWhere#"
+
+Return ( c_Query )
+/*/{Protheus.doc} getQueryParam
+Função responsável por pegar os parâmetros da query.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 27/01/2024
+@param c_Name, character, O nome do query param que eu quero validar.
+/*/
+User Function getQueryParam(c_Name as Character) as Character 
+
+Local c_ParamText as Character
+
+c_ParamText := oRest:GetQueryRequest():GetJsonText(c_Name)
+
+//Se não teve nenhum conteúdo de retorno no meu parâmetro
+If ( c_ParamText == 'null' )
+    //Coloco o conteúdo padrão desses 2 parâmetros da query
+    If ( c_Name == 'page' )
+        c_ParamText := '1'
+    ElseIf ( c_Name == 'pageSize' )
+        c_ParamText := '10'
+    Else
+        c_ParamText := ''
+    EndIf
+EndIf
+
+Return ( c_ParamText )
+/*/{Protheus.doc} buildData
+Faço a construção dos dados dos campos passados no Json.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@param j_Body, json, O Json com o nome dos campos.
+@param o_Resource, object, O recurso que tem o objeto o_HashFields.
+@return array, a_Data => Array com o nome do dado e o seu valor.
+/*/
+User Function buildData(j_Body as Json, o_Resource as Object) as Array
+
+Local a_Data   := {} as Array
+Local a_Fields := {} as Array
+Local n_Field        as Numeric
+Local c_Field        as Character
+
+a_Fields := j_Body:GetNames()
+
+For n_Field := 1 To Len(a_Fields)
+
+    If ( o_Resource:o_HashFields:get(a_Fields[n_Field], @c_Field) )
+        AAdd(a_Data, {c_Field, j_Body[a_Fields[n_Field]]})
+    EndIf
+Next n_Field
+
+Return ( a_Data )
+/*/{Protheus.doc} setOperationModel
+Função onde centralizo a troca de operação do meu model.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@param o_Model, object, O model principal.
+@param n_Operation, numeric, A operação desejada.<br>  3 => Inserção.<br>  4 => Atualização.<br>  5 => Exclusão.
+@return variant, return_description
+/*/
+User Function setOperationModel(o_Model as Object, n_Operation as Numeric)
+
+If ( n_Operation == 3 )
+
+    o_Model:SetOperation(MODEL_OPERATION_INSERT)
+
+ElseIf ( n_Operation == 4 )
+
+    o_Model:SetOperation(MODEL_OPERATION_UPDATE)
+
+ElseIf ( n_Operation == 5 )
+
+    o_Model:SetOperation(MODEL_OPERATION_DELETE)
+EndIf
+
+Return Nil
+/*/{Protheus.doc} setValue
+Faço o set value de todos os campos de um determinado model de acordo com a data.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@param a_Data, array, A data com a seguinte estrutura<br>  [n][1] => Nome do campo.<br>  [n][2] => Valor do campo.
+@param o_Model, object, O model da entidade que será adicionada.
+@param c_Table, character, A tabela do model em questão.
+@return logical, l_Ret => Se todos os campos foram preenchidos.
+/*/
+User Function setValue(a_Data as Array, o_Model as Object, c_Table as Character) as Logical
+
+Local n_i           as Numeric
+Local l_Ret  := .T. as Logical
+
+For n_i := 1 To Len(a_Data)
+
+    If ( a_Data[n_i][1] != c_Table + "_ID" )
+
+        If ( !o_Model:SetValue(a_Data[n_i][1], a_Data[n_i][2]) )
+
+            l_Ret := .F.
+            Exit
+        EndIf
+    EndIf
+Next n_i 
+
+Return ( l_Ret )
+/*/{Protheus.doc} searchRecord
+Procuro pelo registro de acordo com a tabela informada.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@param c_Id, character, O id do campo.
+@param c_Table, character, A tabela onde eu realizo a busca.
+@return logical, Se o registro foi encontrado.
+/*/
+User Function searchRecord(c_Id as Character, c_Table as Character) as Logical
+
+Local l_Ret := .T. as Logical
+
+DbSelectArea(c_Table)
+DbSetOrder(1)
+If ( !(c_Table)->(MsSeek(FwxFilial(c_Table)+c_Id)) )
+    l_Ret := .F.
+    SetRestFault(404, FwHttpEncode("Registro não encontrado: " + c_Id))
+EndIf
+
+Return ( l_Ret )
+/*/{Protheus.doc} getError
+Função para retornar o erro formatado.
+@type function
+@version 1.0
+@author Henrique Freitas Alves
+@since 28/01/2024
+@param a_MsgError, array, Um array com as mensagens de erro.
+@return character, c_Error => A mensagem de erro formatada.
+/*/
+User Function getError(a_MsgError as Array)
+
+Local c_Error as Character
+Local n_Error as Numeric
+
+For n_Error := 1 To Len(a_MsgError)
+
+    If ( ValType(a_MsgError[n_Error]) == "C" )
+
+        c_Error += StrTran( StrTran( a_MsgError[n_Error], "<", "" ), "-", "" ) + (" ")
+    EndIf
+Next
+
+Return ( c_Error )
