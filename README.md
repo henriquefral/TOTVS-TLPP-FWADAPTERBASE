@@ -36,5 +36,6 @@ Para utilizar todas as funcionalidades do tlpp, é preciso utilizar um include q
 ```
 E por último e não menos importante, usar a extensão _".tlpp"_ no arquivo.
 
+Esse estudo, inicialmente, terá como foco a classe [FWAdapterBaseV2](https://tdn.totvs.com/display/public/framework/09.+FWAdapterBaseV2)
 
-
+Uma classe voltada para serviços REST, baseado no padrão oData.
