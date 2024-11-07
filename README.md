@@ -39,3 +39,13 @@ E por último e não menos importante, usar a extensão _".tlpp"_ no arquivo.
 Esse estudo, inicialmente, terá como foco a classe [FWAdapterBaseV2](https://tdn.totvs.com/display/public/framework/09.+FWAdapterBaseV2)
 
 Uma classe voltada para serviços REST, baseado no padrão oData.
+
+O projeto será baseado na seguinte estrutura:
+
+- Controler;
+  - Irá orquestrar os dados de quem fez a requisição, irá entrar em contato com o Service de acordo com a solicitação (ou endpoint) do cliente.
+- Service;
+  - Tem a lógica da operação (do serviço/trabalho) que será executado, faz o processo de acordo com o que foi pedido pelo controller.
+- Data.
+  - A parte relacionada aos dados. Ele irá controlar os dados de acordo com a solicitação do Service.
+ 
