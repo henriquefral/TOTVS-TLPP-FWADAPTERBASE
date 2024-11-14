@@ -3,7 +3,7 @@
 namespace owners
 
 /*/{Protheus.doc} OnwersService
-A classe responsÃ¡vel pela lÃ³gica, ele Ã© o comunicador oficial da minha classe de dados, e ele vai retornar os dados para o controller.
+A classe responsável pela lógica, ele é o comunicador oficial da minha classe de dados, e ele vai retornar os dados para o controller.
 @type class
 @version 1.0
 @author Henrique Freitas Alves
@@ -21,7 +21,7 @@ Public method delete() as Json
 
 EndClass
 /*/{Protheus.doc} OnwersService::new() as Object
-O mÃ©todo responsÃ¡vel por iniciar a resposta em Json.
+O método responsável por iniciar a resposta em Json.
 @type method
 @version 1.0
 @author Henrique Freitas Alves
@@ -34,18 +34,18 @@ Method new() as Object Class OnwersService
 
 Return ( Self )
 /*/{Protheus.doc} OnwersService::get
-ResponsÃ¡vel por solicitar a classe OwnersData os dados da minha entidade.
+Responsável por solicitar a classe OwnersData os dados da minha entidade.
 @type method
 @version 1.0
 @author Henrique Freitas Alves
 @since 27/01/2024
-@param n_Page, numeric, A pÃ¡gina que eu estou pegando dos registros.
-@param n_PageSize, numeric, O tamanho da pÃ¡gina do retorno dos registros.
-@param [c_Filter], character, Filtro informado por parÃ¢metros via query.
-@param [c_Fields], character, Os campos utilizados para a geraÃ§Ã£o do Json.
-@param [c_Sort], character, A ordenaÃ§Ã£o da query que serÃ¡ feita.
-@param [c_OwnerId], character, O id da minha entidade, caos queira pegar um Ãºnico registro.
-@return json, A resposta dessa operaÃ§Ã£o.
+@param n_Page, numeric, A página que eu estou pegando dos registros.
+@param n_PageSize, numeric, O tamanho da página do retorno dos registros.
+@param [c_Filter], character, Filtro informado por parâmetros via query.
+@param [c_Fields], character, Os campos utilizados para a geração do Json.
+@param [c_Sort], character, A ordenação da query que será feita.
+@param [c_OwnerId], character, O id da minha entidade, caos queira pegar um único registro.
+@return json, A resposta dessa operação.
 /*/
 Method get(n_Page as Numeric, n_PageSize as Numeric, c_Filter as Character, c_Fields as Character, c_Sort as Character, c_OwnerId as Character) as Json Class OnwersService
 
@@ -58,22 +58,23 @@ o_Data:get(n_Page, n_PageSize, c_Filter, c_Fields, c_Sort, c_OwnerId)
 If ( o_Data:lOk )
 
     ::j_Response := o_Data:gtJsonObjResponse()
-
+    //Como ele retorna de uma forma geral, caso esteja preenchido o id, eu pego somente um. Afinal, se eu procuro pelo id, eu quero somente 1 registro.
     If ( !Empty(c_OwnerId) .AND. Len(::j_Response["items"]) > 0 )
         ::j_Response := ::j_Response["items"][1]
     EndIf
 Else
+    //Retorno um bad return, com o código e a mensagem do erro no padrão da classe.
     ::j_Response := SetRestFault(o_Data:GetCode(), o_Data:GetMessage())
 EndIf
 
 Return ( ::j_Response )
 /*/{Protheus.doc} OnwersService::post(n_Operation as Numeric, j_Body as Json) as Json
-FaÃ§o a operaÃ§Ã£o do post.
+Faço a operação do post.
 @type method
 @version 1.0
 @author Henrique Freitas Alves
 @since 28/01/2024
-@return json, A resposta dessa operaÃ§Ã£o.
+@return json, A resposta dessa operação.
 /*/
 Method post(n_Operation as Numeric, j_Body as Json) as Json Class OnwersService
 
@@ -89,12 +90,12 @@ EndIf
 
 Return ( ::j_Response )
 /*/{Protheus.doc} OnwersService::put(n_Operation as Numeric, j_Body as Json, c_OwnerId as Character) as Json
-Chamo a alteraÃ§Ã£o efetiva e retorno a informaÃ§Ã£o.
+Chamo a alteração efetiva e retorno a informação.
 @type method
 @version 1.0
 @author Henrique Freitas Alves
 @since 31/01/2024
-@return json, A resposta dessa operaÃ§Ã£o.
+@return json, A resposta dessa operação.
 /*/
 Method put(n_Operation as Numeric, j_Body as Json, c_OwnerId as Character) as Json Class OnwersService
 
@@ -110,12 +111,12 @@ EndIf
 
 Return ( ::j_Response )
 /*/{Protheus.doc} OnwersService::delete(n_Operation as Numeric, c_OwnerId as Character) as Json
-Chamo a exclusÃ£o efetiva e retorno a informaÃ§Ã£o.
+Chamo a exclusão efetiva e retorno a informação.
 @type method
 @version 1.0
 @author Henrique Freitas Alves
 @since 31/01/2024
-@return json, A resposta dessa operaÃ§Ã£o.
+@return json, A resposta dessa operação.
 /*/
 Method delete(n_Operation as Numeric, c_OwnerId as Character) as Json Class OnwersService
 

@@ -21,22 +21,22 @@ c_Query += "WHERE #QueryWhere#"
 
 Return ( c_Query )
 /*/{Protheus.doc} getQueryParam
-Fun√ß√£o respons√°vel por pegar os par√¢metros da query.
+FunÁ„o respons·vel por pegar os par‚metros da requisiÁ„o nos queryparams.
 @type function
 @version 1.0
 @author Henrique Freitas Alves
 @since 27/01/2024
-@param c_Name, character, O nome do query param que eu quero validar.
+@param c_Name, character, O nome do query param que eu quero obter.
 /*/
 User Function getQueryParam(c_Name as Character) as Character 
 
 Local c_ParamText as Character
-
+//Vai retornar o texto da propriedade indicada no c_Name
 c_ParamText := oRest:GetQueryRequest():GetJsonText(c_Name)
 
-//Se n√£o teve nenhum conte√∫do de retorno no meu par√¢metro
+//Se n„o teve nenhum conte˙do de retorno no meu par‚metro, ou seja, n„o h· nenhum valor para o queryparam indicado no c_Name
 If ( c_ParamText == 'null' )
-    //Coloco o conte√∫do padr√£o desses 2 par√¢metros da query
+    //Coloco o conte˙do padr„o desses 2 par‚metros da query
     If ( c_Name == 'page' )
         c_ParamText := '1'
     ElseIf ( c_Name == 'pageSize' )
@@ -48,7 +48,7 @@ EndIf
 
 Return ( c_ParamText )
 /*/{Protheus.doc} buildData
-Fa√ßo a constru√ß√£o dos dados dos campos passados no Json.
+FaÁo a construÁ„o dos dados dos campos passados no Json.
 @type function
 @version 1.0
 @author Henrique Freitas Alves
@@ -75,13 +75,13 @@ Next n_Field
 
 Return ( a_Data )
 /*/{Protheus.doc} setOperationModel
-Fun√ß√£o onde centralizo a troca de opera√ß√£o do meu model.
+FunÁ„o onde centralizo a troca de operaÁ„o do meu model.
 @type function
 @version 1.0
 @author Henrique Freitas Alves
 @since 28/01/2024
 @param o_Model, object, O model principal.
-@param n_Operation, numeric, A opera√ß√£o desejada.<br>  3 => Inser√ß√£o.<br>  4 => Atualiza√ß√£o.<br>  5 => Exclus√£o.
+@param n_Operation, numeric, A operaÁ„o desejada.<br>  3 => InserÁ„o.<br>  4 => AtualizaÁ„o.<br>  5 => Exclus„o.
 @return variant, return_description
 /*/
 User Function setOperationModel(o_Model as Object, n_Operation as Numeric)
@@ -101,14 +101,14 @@ EndIf
 
 Return Nil
 /*/{Protheus.doc} setValue
-Fa√ßo o set value de todos os campos de um determinado model de acordo com a data.
+FaÁo o set value de todos os campos de um determinado model de acordo com a data.
 @type function
 @version 1.0
 @author Henrique Freitas Alves
 @since 28/01/2024
 @param a_Data, array, A data com a seguinte estrutura<br>  [n][1] => Nome do campo.<br>  [n][2] => Valor do campo.
-@param o_Model, object, O model da entidade que ser√° adicionada.
-@param c_Table, character, A tabela do model em quest√£o.
+@param o_Model, object, O model da entidade que ser· adicionada.
+@param c_Table, character, A tabela do model em quest„o.
 @return logical, l_Ret => Se todos os campos foram preenchidos.
 /*/
 User Function setValue(a_Data as Array, o_Model as Object, c_Table as Character) as Logical
@@ -147,12 +147,12 @@ DbSelectArea(c_Table)
 DbSetOrder(1)
 If ( !(c_Table)->(MsSeek(FwxFilial(c_Table)+c_Id)) )
     l_Ret := .F.
-    SetRestFault(404, FwHttpEncode("Registro n√£o encontrado: " + c_Id))
+    SetRestFault(404, FwHttpEncode("Registro n„o encontrado: " + c_Id))
 EndIf
 
 Return ( l_Ret )
 /*/{Protheus.doc} getError
-Fun√ß√£o para retornar o erro formatado.
+FunÁ„o para retornar o erro formatado.
 @type function
 @version 1.0
 @author Henrique Freitas Alves

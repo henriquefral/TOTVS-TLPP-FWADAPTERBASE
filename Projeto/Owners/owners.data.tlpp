@@ -168,9 +168,9 @@ Local l_Ret  := .T. as Logical
 If ( n_Operation <> 5 )
     a_Data := utils.U_buildData(j_Body, Self)
 EndIf
-
+//Se for diferente de inclusão, é algo que remete em um registro já existente
 If ( n_Operation <> 3 )
-
+    //Portanto, procuro pelo registro informado no ownerid
     If ( !utils.U_searchRecord(c_OwnerId, "ZSB") )
 
         l_Ret := .F.
