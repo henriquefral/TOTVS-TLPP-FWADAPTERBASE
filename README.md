@@ -1,7 +1,13 @@
 # Um estudo básico e simples sobre a linguagem TLPP, da TOTVS. #
 
-Informações reunidas com base no [link oficial da Totvs](https://tdn.totvs.com/display/tec/TLPP)
+Informações reunidas com base no [link oficial da Totvs](https://tdn.totvs.com/display/tec/TLPP).
+Um projeto trazendo um pouco do TLPP com a classe para fazer requisições REST, no padrão oData. [FWAdapterBaseV2](https://tdn.totvs.com/display/public/framework/09.+FWAdapterBaseV2).
 
+- [TLPP](#tlpp)
+- [Padrão oData](#odata)
+  
+<div id='tlpp'> 
+  
 ## O que é o TLPP? ##
 
 É a evolução natural do ADVPL, vem com a proposta de auxiliar os desenvolvedores em ADVPL com novas funções. Traz recursos como: 
@@ -36,7 +42,7 @@ Para utilizar todas as funcionalidades do tlpp, é preciso utilizar um include q
 ```
 E por último e não menos importante, usar a extensão _".tlpp"_ no arquivo.
 
-Esse estudo, inicialmente, terá como foco a classe [FWAdapterBaseV2](https://tdn.totvs.com/display/public/framework/09.+FWAdapterBaseV2)
+Esse estudo, inicialmente, terá como foco a classe [FWAdapterBaseV2](https://tdn.totvs.com/display/public/framework/09.+FWAdapterBaseV2).
 
 Uma classe voltada para serviços REST, baseado no padrão oData.
 
@@ -48,4 +54,14 @@ O projeto será baseado na seguinte estrutura:
   - Tem a lógica da operação (do serviço/trabalho) que será executado, faz o processo de acordo com o que foi pedido pelo controller.
 - Data.
   - A parte relacionada aos dados. Ele irá controlar os dados de acordo com a solicitação do Service.
- 
+</div>
+<div id='odata'> 
+  
+## Padrão oData? ##
+
+OData (Open Data Protocol) é um padrão definido pela OASIS (Organization for the Advancement of Structured Information Standards), que define um conjunto de normas e padrões a serem seguidos para o consumo e criação de RESTful APIs. 
+A versão atual é a 4.0 e segue um padrão aprovado pela ISO e IEC.
+
+A intenção desse padrão é poder manter o foco na lógica do processo, sem se preocupar muito com as práticas utlizadas na criação dos serviços.
+  
+</div>
